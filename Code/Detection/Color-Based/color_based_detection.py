@@ -27,17 +27,47 @@ while (1):
     # color space
     hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
 
+    ###############
+    #     RED     #
+    ###############
+
     # Set range for red color
     red_lower = np.array([136, 87, 111], np.uint8)
     red_upper = np.array([180, 255, 255], np.uint8)
     # create/set a red mask
     red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
 
+    ###############
+    #    GREEN    #
+    ###############
+
+    # we set a range as well
+    green_lower = np.array([25, 52, 72], np.uint8)
+    green_upper = np.array([102, 255, 255], np.uint8)
+    # we set a green mask
+    green_mask = cv2.inRange(hsvFrame, green_lower, green_upper)
+
     kernal = np.ones((5, 5), "uint8")
+
+    ###############
+    #     RED     #
+    ###############
 
     red_mask = cv2.dilate(red_mask, kernal)
     res_red = cv2.bitwise_and(imageFrame, imageFrame,
                               mask=red_mask)
+
+    ###############
+    #    GREEN    #
+    ###############
+
+    green_mask = cv2.dilate(green_mask, kernal)
+    res_green = cv2.bitwise_and(imageFrame, imageFrame,
+                                mask = green_mask)
+
+    ###############
+    #     RED     #
+    ###############
 
     # Creating contour to track red color
     contours, hierarchy = cv2.findContours(red_mask,
@@ -55,9 +85,29 @@ while (1):
                                        (0, 0, 255), 2)
 
             # put text above the square (in our case not really needed since we only classify one class)
-            cv2.putText(imageFrame, "Ripe Strawberry", (x, y),
+            cv2.putText(imageFrame, "Ripe", (x, y),
                         cv2.FONT_HERSHEY_SIMPLEX, 1.0,
                         (0, 0, 255))
+
+    ###############
+    #    GREEN    #
+    ###############
+
+    contours, hierarchy = cv2.findContours(green_mask,
+                                           cv2.RETR_TREE,
+                                           cv2.CHAIN_APPROX_SIMPLE)
+
+    for pic, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
+        if (area > 300):
+            x, y, w, h = cv2.boundingRect(contour)
+            imageFrame = cv2.rectangle(imageFrame, (x, y),
+                                       (x + w, y + h),
+                                       (0, 255, 0), 2)
+
+            cv2.putText(imageFrame, "Not Ripe", (x, y),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1.0, (0, 255, 0))
 
     # Program Termination
     cv2.imshow("Ripe Strawberry Detection", imageFrame)
