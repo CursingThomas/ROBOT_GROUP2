@@ -13,7 +13,7 @@ For this Implementation to work u will need the following:
 - Python 3.x version
 (The Version that worked best for me was 3.7)
 
-## Installation of OpenCV (for Windows)
+## Installation of OpenCV
 
 Installing OpenCV in ur Project IDE works with the following command: 
 > pip install opencv-python
