@@ -110,7 +110,7 @@ while (1):
                         1.0, (0, 255, 0))
 
     # Program Termination
-    cv2.imshow("Ripe Strawberry Detection", imageFrame)
+    cv2.imshow("Ripe Detection", imageFrame)
     if cv2.waitKey(10) & 0xFF == ord('q'):
         cap.release()
         cv2.destroyAllWindows()
