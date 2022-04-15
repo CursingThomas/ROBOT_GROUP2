@@ -113,4 +113,4 @@ Since this program is an open while-loop ( meaning it can only be terminated by 
 
 ```
 
-Sometimes this may not work: try to remove cap.release() then the issue might be gone. In our case we would hae to either change the input for the termination to work with our prototype, or keep a running prototype that terminates the program if the entire system is shut down.
+Sometimes this may not work: try to remove cap.release() then the issue might be gone. In our case we would hae to either change the input for the termination to work with our prototype, or keep a running prototype that terminates the program if the entire system is shut down. (No input)
