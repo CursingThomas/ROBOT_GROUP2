@@ -6,6 +6,20 @@ import cv2
 # use python 3.7 in your configs
 import cap
 
+import paho.mqtt.client as mqtt
+import time
+
+mqttBroker = "mqtt.eclipseprojects.io"
+client = mqtt.Client("Simon")
+client.connect(mqttBroker)
+print("Connected to broker")
+
+def CurrentTime():
+    return int(time.time())
+
+timeCounter = 30
+currentTime = CurrentTime()
+
 # Capturing video through webcam
 # 0 .. live camera input
 webcam = cv2.VideoCapture(0)
@@ -17,6 +31,14 @@ webcam = cv2.VideoCapture(0)
 # Start a while loop
 while (1):
 
+    addedTime = currentTime + timeCounter
+    if  currentTime > addedTime:
+        client.publish("BIPDemo/Messages", "KeepAlive")
+        timeCounter = 30
+        print("KeepAlive sent")
+    
+
+  
     # Reading the video from the
     # webcam in image frames
     _, imageFrame = webcam.read()
@@ -78,6 +100,8 @@ while (1):
         area = cv2.contourArea(contour)
         if (area > 300):
             x, y, w, h = cv2.boundingRect(contour)
+            client.publish("BIPDemo/Messages", '1')
+            timeCounter = 30
 
             # draw a square
             imageFrame = cv2.rectangle(imageFrame, (x, y),
@@ -100,6 +124,8 @@ while (1):
     for pic, contour in enumerate(contours):
         area = cv2.contourArea(contour)
         if (area > 300):
+            client.publish("BIPDemo/Messages", '0')
+            timeCounter = 30
             x, y, w, h = cv2.boundingRect(contour)
             imageFrame = cv2.rectangle(imageFrame, (x, y),
                                        (x + w, y + h),
