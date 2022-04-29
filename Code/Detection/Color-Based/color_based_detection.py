@@ -64,8 +64,8 @@ while (1):
     ###############
 
     # we set a range as well
-    green_lower = np.array([25, 52, 72], np.uint8)
-    green_upper = np.array([102, 255, 255], np.uint8)
+    green_lower = np.array([57, 64, 55], np.uint8)
+    green_upper = np.array([80, 255, 255], np.uint8)
     # we set a green mask
     green_mask = cv2.inRange(hsvFrame, green_lower, green_upper)
 
