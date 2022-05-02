@@ -17,8 +17,9 @@ print("Connected to broker")
 def CurrentTime():
     return int(time.time())
 
-timeCounter = 30
-currentTime = CurrentTime()
+keepAliveTimer = 30
+timer =1
+previousKeepAlive, previousGreen, previousRed = CurrentTime()
 
 # Capturing video through webcam
 # 0 .. live camera input
@@ -30,11 +31,11 @@ webcam = cv2.VideoCapture(0)
 
 # Start a while loop
 while (1):
+    currentTime = CurrentTime()
 
-    addedTime = currentTime + timeCounter
-    if  currentTime > addedTime:
+    if  currentTime - previousKeepAlive >= keepAliveTimer:
         client.publish("BIPDemo/Messages", "KeepAlive")
-        timeCounter = 30
+        previousKeepAlive = currentTime
         print("KeepAlive sent")
     
 
@@ -100,8 +101,10 @@ while (1):
         area = cv2.contourArea(contour)
         if (area > 300):
             x, y, w, h = cv2.boundingRect(contour)
-            client.publish("BIPDemo/Messages", '1')
-            timeCounter = 30
+            if(currentTime - previousRed >= timer1):
+                previousKeepAlive, previousRed = currentTime
+                client.publish("BIPDemo/Messages", '1')
+                keepAliveTimer = 30
 
             # draw a square
             imageFrame = cv2.rectangle(imageFrame, (x, y),
@@ -124,8 +127,11 @@ while (1):
     for pic, contour in enumerate(contours):
         area = cv2.contourArea(contour)
         if (area > 300):
-            client.publish("BIPDemo/Messages", '0')
-            timeCounter = 30
+            if(currentTime - previousGreen >= timer1):
+                client.publish("BIPDemo/Messages", '0')
+                previousKeepAlive, previousGreen = currentTime
+            
+
             x, y, w, h = cv2.boundingRect(contour)
             imageFrame = cv2.rectangle(imageFrame, (x, y),
                                        (x + w, y + h),
