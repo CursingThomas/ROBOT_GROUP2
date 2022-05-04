@@ -1,6 +1,6 @@
 #define MOROBOT_TYPE morobot_s_rrp // morobot_s_rrr, morobot_s_rrp, morobot_2d, morobot_3d, morobot_p
-#define SERIAL_PORT "Serial2"   // "Serial", "Serial1", "Serial2", "Serial3" (not all supported for all microcontroller - see readme)
-//#define ESP32 ESP32
+#define SERIAL_PORT "Serial1"   // "Serial", "Serial1", "Serial2", "Serial3" (not all supported for all microcontroller - see readme)
+#define ESP32 ESP32
 
 #include <morobot.h>
 
@@ -46,12 +46,10 @@ void loop() {
    morobot.moveInDirection('z', -20);
    //morobot.moveXYZ(0, 0, -20);
    morobot.waitUntilIsReady();
-
    morobot.moveInDirection('z', 20);
    //morobot.moveXYZ(0, 0, 20);
    morobot.waitUntilIsReady();
    i = 0;
-
  */
 
   while(i < 5){
