@@ -18,8 +18,10 @@ def CurrentTime():
     return int(time.time())
 
 keepAliveTimer = 30
-timer =1
-previousKeepAlive, previousGreen, previousRed = CurrentTime()
+timer1 =1
+previousKeepAlive = CurrentTime()
+previousGreen = CurrentTime()
+previousRed = CurrentTime()
 
 # Capturing video through webcam
 # 0 .. live camera input
@@ -102,7 +104,8 @@ while (1):
         if (area > 300):
             x, y, w, h = cv2.boundingRect(contour)
             if(currentTime - previousRed >= timer1):
-                previousKeepAlive, previousRed = currentTime
+                previousKeepAlive = currentTime
+                previousRed = currentTime
                 client.publish("BIPDemo/Messages", '1')
                 keepAliveTimer = 30
 
@@ -129,8 +132,8 @@ while (1):
         if (area > 300):
             if(currentTime - previousGreen >= timer1):
                 client.publish("BIPDemo/Messages", '0')
-                previousKeepAlive, previousGreen = currentTime
-            
+                previousKeepAlive = currentTime
+                previousGreen = currentTime
 
             x, y, w, h = cv2.boundingRect(contour)
             imageFrame = cv2.rectangle(imageFrame, (x, y),
