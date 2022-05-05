@@ -20,18 +20,6 @@ const char* mqtt_server = "mqtt.eclipseprojects.io";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-void setup() {
-  morobot.begin(SERIAL_PORT);
-  morobot.setZero();  // reset angles / moveHome()
-  //morobot.moveZAxisIn(); doesnt seem to work well moves too much     // Set the global speed for all motors here. This value can be overwritten temporarily if a function is called with a speed parameter explicitely.
-
-  Serial.begin(115200);
-  
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
-}
-
 void setup_wifi() {
   delay(10);
   // We start by connecting to a WiFi network
@@ -59,7 +47,7 @@ void reconnect() {
   {
       Serial.print("Attempting MQTT connection...");
       // Attempt to connect
-      if (client.connect("client")) 
+      if (client.connect("ESP8266Client")) 
       {
         Serial.println("connected");
         // Subscribe
@@ -81,7 +69,7 @@ void callback(char* topic, byte* message, unsigned int length)
 {
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
-  Topic = topic;
+  Topic = topic; //doesn't work good
   Serial.print(". Message: ");
   
   for (int i = 0; i < length; i++) 
@@ -93,6 +81,21 @@ void callback(char* topic, byte* message, unsigned int length)
   Serial.println();
 }
 
+void setup() {
+  morobot.begin(SERIAL_PORT);
+  morobot.setZero();  // reset angles / moveHome()
+  //morobot.moveZAxisIn(); doesnt seem to work well moves too much     // Set the global speed for all motors here. This value can be overwritten temporarily if a function is called with a speed parameter explicitely.
+
+  Serial.begin(115200);
+  
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+}
+
+void clearBuffer() {
+  messageTemp = "";
+}
 
 void loop() {
 
@@ -108,19 +111,21 @@ void loop() {
 
   if (String(Topic) == "Fruitsystem/color")
   { 
-    Serial.print("I got something");
     if(messageTemp == "1")//the number it gets when red
     { 
       Serial.println("Ripe");
+      clearBuffer();
       morobot.moveToAngles(-xMove, yMove, 0); //moves to absolute angles
       morobot.waitUntilIsReady();
     }
     else if(messageTemp == "0")//the number it gets when green
     {
       Serial.println("Unripe");
+      clearBuffer();
       morobot.moveToAngles(xMove, -yMove, 0);
       morobot.waitUntilIsReady();
     }
+    strcpy(Topic, " ");
   }
    
    client.loop();
