@@ -59,11 +59,11 @@ void reconnect() {
   {
       Serial.print("Attempting MQTT connection...");
       // Attempt to connect
-      if (client.connect("ESP8266Client")) 
+      if (client.connect("client")) 
       {
         Serial.println("connected");
         // Subscribe
-        client.subscribe("esp32/output");
+        client.subscribe("Fruitsystem/color");
       } 
       else 
       {
