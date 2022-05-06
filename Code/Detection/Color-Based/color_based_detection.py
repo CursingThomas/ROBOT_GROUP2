@@ -106,7 +106,7 @@ while (1):
             if(currentTime - previousRed >= timer1):
                 previousKeepAlive = currentTime
                 previousRed = currentTime
-                client.publish("BIPDemo/Messages", '1')
+                client.publish("Fruitsystem/color", '1')
                 keepAliveTimer = 30
 
             # draw a square
@@ -131,7 +131,7 @@ while (1):
         area = cv2.contourArea(contour)
         if (area > 300):
             if(currentTime - previousGreen >= timer1):
-                client.publish("BIPDemo/Messages", '0')
+                client.publish("Fruitsystem/color", '0')
                 previousKeepAlive = currentTime
                 previousGreen = currentTime
 
