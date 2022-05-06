@@ -10,7 +10,7 @@
 
 MOROBOT_TYPE morobot;   // And change the class-name here
 String messageTemp;
-char* Topic;
+String Topic;
 
 const char* ssid = "Sara"; //change to your own ssid
 const char* password = "12345678"; //change to your own password
@@ -47,7 +47,7 @@ void reconnect() {
   {
       Serial.print("Attempting MQTT connection...");
       // Attempt to connect
-      if (client.connect("ESP8266Client")) 
+      if (client.connect("Robot")) 
       {
         Serial.println("connected");
         // Subscribe
@@ -69,7 +69,7 @@ void callback(char* topic, byte* message, unsigned int length)
 {
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
-  Topic = topic; //doesn't work good
+  Topic = String(topic); 
   Serial.print(". Message: ");
   
   for (int i = 0; i < length; i++) 
@@ -101,7 +101,7 @@ void loop() {
 
   if (!client.connected()) 
   {
-    reconnect();
+      reconnect();
   }
  
   morobot.setSpeedRPM(1);
@@ -125,7 +125,7 @@ void loop() {
       morobot.moveToAngles(xMove, -yMove, 0);
       morobot.waitUntilIsReady();
     }
-    strcpy(Topic, " ");
+    Topic = "";
   }
    
    client.loop();
