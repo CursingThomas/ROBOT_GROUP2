@@ -1,0 +1,63 @@
+#######################################
+# Syntax Coloring Map For morobot Library
+#######################################
+
+####################################### 
+# Class and Datatypes (KEYWORD1)
+#######################################
+morobotClass	KEYWORD1
+morobot_2d	KEYWORD1
+morobot_3d	KEYWORD1
+morobot_p	KEYWORD1
+morobot_s_rrp	KEYWORD1
+morobot_s_rrr	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+begin	KEYWORD2
+setZero	KEYWORD2
+moveHome	KEYWORD2
+setSpeedRPM	KEYWORD2
+setTCPoffset	KEYWORD2
+checkIfAngleValid	KEYWORD2
+setBreaks	KEYWORD2
+releaseBreaks	KEYWORD2
+setBusy	KEYWORD2
+setIdle	KEYWORD2
+waitUntilIsReady	KEYWORD2
+checkIfMotorMoves	KEYWORD2
+getActAngle	KEYWORD2
+getActPosition	KEYWORD2
+getActOrientation	KEYWORD2
+getSpeed	KEYWORD2
+getTemp	KEYWORD2
+getVoltage	KEYWORD2
+getCurrent	KEYWORD2
+getNumSmartServos	KEYWORD2
+moveToAngle	KEYWORD2
+moveToAngles	KEYWORD2
+moveAngle	KEYWORD2
+moveAngles	KEYWORD2
+moveToPose	KEYWORD2
+moveXYZ	KEYWORD2
+moveInDirection	KEYWORD2
+printAngles	KEYWORD2
+printTCPpose	KEYWORD2
+convertToDeg	KEYWORD2
+convertToRad	KEYWORD2
+getType	KEYWORD2
+calculateAngles	KEYWORD2
+updateTCPpose	KEYWORD2
+autoCalibrateLinearAxis	KEYWORD2
+isReady	KEYWORD2
+checkIfAnglesValid	KEYWORD2
+moveZAxisIn	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+BREAK_LOOSE	LITERAL1
+BREAK_BRAKED	LITERAL1
+NUM_MAX_SERVOS	LITERAL1
+TIMEOUT_DELAY	LITERAL1
