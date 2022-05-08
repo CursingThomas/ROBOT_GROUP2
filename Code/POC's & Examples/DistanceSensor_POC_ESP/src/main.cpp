@@ -1,7 +1,7 @@
 #include <Arduino.h>
-#define echoPin 2
-#define trigPin 3
 
+#define echoPin 18
+#define trigPin 5
 
 long duration;
 int distance;
