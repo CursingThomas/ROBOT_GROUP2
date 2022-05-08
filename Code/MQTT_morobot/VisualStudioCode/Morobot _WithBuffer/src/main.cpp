@@ -1,33 +1,37 @@
 #include <Arduino.h>
 #include <morobot.h>
+#include <CircularBuffer.h>
 
 #include <WiFi.h>
 #include <PubSubClient.h>
 
 #include <../include/buffer.h>
 
-#define MOROBOT_TYPE morobot_s_rrp // morobot_s_rrr, morobot_s_rrp, morobot_2d, morobot_3d, morobot_p
-#define SERIAL_PORT "Serial1"	   // "Serial", "Serial1", "Serial2", "Serial3" (not all supported for all microcontroller - see readme)
-//#define ESP32         ESP32
+//Defines
+#define MOROBOT_TYPE	 morobot_s_rrp // morobot_s_rrr, morobot_s_rrp, morobot_2d, morobot_3d, morobot_p
+#define SERIAL_PORT		 "Serial1"	   // "Serial", "Serial1", "Serial2", "Serial3" (not all supported for all microcontroller - see readme)
+#define ESP32         	 ESP32
 
+//Objects
 MOROBOT_TYPE morobot; // And change the class-name here
+WiFiClient espClient;
+PubSubClient client(espClient);
+CircularBuffer<String, 3> buffer;
 
+//global variables
 String Topic;
-Buffer buffer = Buffer();
+bool datapushed = false;
 
 const char *ssid = "Sara";		   // change to your own ssid
 const char *password = "12345678"; // change to your own password
-
 const char *mqtt_server = "mqtt.eclipseprojects.io";
 
-WiFiClient espClient;
-PubSubClient client(espClient);
-
-bool datapushed = false;
+//function prototypes
 
 void setup_wifi();
 void reconnect();
 void callback(char *topic, byte *payload, unsigned int length);
+
 
 void setup()
 {
@@ -55,16 +59,14 @@ void loop()
 	// float yMove = 45;
 
 	// If the buffer is not empty, pop the first message and move the robot
-	if (datapushed == true && buffer.IsEmpty() == false)
+	if (buffer.size() > 0)
 	{
 		String message = buffer.pop();
-		Serial.println("Message = " + message);
 		if (message == "1") // the number it gets when red
 		{
 			Serial.println("Ripe");
 			// morobot.moveToAngles(-xMove, yMove, 0); //moves to absolute angles
 			// morobot.waitUntilIsReady();
-			Serial.println(buffer.get(1));
 			client.publish("Fruitsystem/robot", "OnPosition");
 			message = "";
 		}
@@ -73,7 +75,6 @@ void loop()
 			Serial.println("Unripe");
 			// morobot.moveToAngles(xMove, -yMove, 0);
 			// morobot.waitUntilIsReady();
-			Serial.println(buffer.get(1));
 			client.publish("Fruitsystem/robot", "OnPosition");
 			message = "";
 		}
@@ -138,7 +139,7 @@ void callback(char *topic, byte *message, unsigned int length)
 	Serial.print("Message arrived on topic: ");
 	Serial.print(topic);
 	Topic = String(topic);
-	Serial.print(". Message: ");
+	Serial.println(". Message: ");
 
 	for (int i = 0; i < length; i++)
 	{
