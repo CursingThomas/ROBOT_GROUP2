@@ -4,6 +4,9 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
+#include "ripeness_enum.h"
+#include "DistanceSensor.h"
+
 #define MOROBOT_TYPE   morobot_s_rrp // morobot_s_rrr, morobot_s_rrp, morobot_2d, morobot_3d, morobot_p
 #define SERIAL_PORT   "Serial1"   // "Serial", "Serial1", "Serial2", "Serial3" (not all supported for all microcontroller - see readme)
 #define ESP32 ESP32
@@ -19,6 +22,7 @@ const char* mqtt_server = "mqtt.eclipseprojects.io";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+DistanceSensor ultraSensor (4, 2);
 
 void setup_wifi();
 void reconnect();
@@ -28,16 +32,15 @@ void setup() {
   morobot.begin(SERIAL_PORT);
   morobot.setZero();  // reset angles / moveHome()
   //morobot.moveZAxisIn(); doesnt seem to work well moves too much     // Set the global speed for all motors here. This value can be overwritten temporarily if a function is called with a speed parameter explicitely.
-
   Serial.begin(115200);
-  
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 }
 
-void loop() {
-
+void loop() 
+{
+  ultraSensor.watchForObjects();
   if (!client.connected()) 
   {
       reconnect();
@@ -50,7 +53,7 @@ void loop() {
 
   if (String(Topic) == "Fruitsystem/color")
   { 
-    if(messageTemp == "1")//the number it gets when red
+    if(messageTemp.toInt() == Ripe)//the number it gets when red
     { 
       Serial.println("Ripe");
       messageTemp = "";
@@ -58,7 +61,7 @@ void loop() {
       morobot.waitUntilIsReady();
       client.publish("Fruitsystem/robot", "OnPosition");
     }
-    else if(messageTemp == "0")//the number it gets when green
+    else if(messageTemp.toInt() == Unripe)//the number it gets when green
     {
       Serial.println("Unripe");
       messageTemp = "";
@@ -68,7 +71,11 @@ void loop() {
     }
     Topic = "";
   }
-   
+  if(ultraSensor.getFlag() == true)
+  {
+    Serial.println("Something just passed");
+    ultraSensor.disableFlag();
+  }   
    client.loop();
 }
 
