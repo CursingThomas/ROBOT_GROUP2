@@ -71,6 +71,7 @@ void loop()
     }
     Topic = "";
   }
+  client.publish("Fruitsystem/robot", "Temp: %d", morobot.getTemp());
   if(ultraSensor.getFlag() == true)
   {
     Serial.println("Something just passed");
