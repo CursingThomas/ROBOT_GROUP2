@@ -57,8 +57,8 @@ while (1):
     ###############
 
     # Set range for red color
-    red_lower = np.array([136, 87, 111], np.uint8)
-    red_upper = np.array([180, 255, 255], np.uint8)
+    red_lower = np.array([161, 155, 84], np.uint8)
+    red_upper = np.array([179, 255, 255], np.uint8)
     # create/set a red mask
     red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
 
@@ -106,7 +106,7 @@ while (1):
             if(currentTime - previousRed >= timer1):
                 previousKeepAlive = currentTime
                 previousRed = currentTime
-                client.publish("BIPDemo/Messages", '1')
+                client.publish("Fruitsystem/color", '1')
                 keepAliveTimer = 30
 
             # draw a square
@@ -131,7 +131,7 @@ while (1):
         area = cv2.contourArea(contour)
         if (area > 300):
             if(currentTime - previousGreen >= timer1):
-                client.publish("BIPDemo/Messages", '0')
+                client.publish("Fruitsystem/color", '0')
                 previousKeepAlive = currentTime
                 previousGreen = currentTime
 

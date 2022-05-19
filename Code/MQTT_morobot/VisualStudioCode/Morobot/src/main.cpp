@@ -4,13 +4,16 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
+#include "ripeness_enum.h"
+#include "DistanceSensor.h"
+
 #define MOROBOT_TYPE   morobot_s_rrp // morobot_s_rrr, morobot_s_rrp, morobot_2d, morobot_3d, morobot_p
 #define SERIAL_PORT   "Serial1"   // "Serial", "Serial1", "Serial2", "Serial3" (not all supported for all microcontroller - see readme)
 #define ESP32 ESP32
 
 MOROBOT_TYPE morobot;   // And change the class-name here
 String messageTemp;
-char* Topic;
+String Topic;
 
 const char* ssid = "Sara"; //change to your own ssid
 const char* password = "12345678"; //change to your own password
@@ -19,7 +22,65 @@ const char* mqtt_server = "mqtt.eclipseprojects.io";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+DistanceSensor ultraSensor (4, 2);
 
+void setup_wifi();
+void reconnect();
+void callback(char* topic, byte* payload, unsigned int length);
+
+void setup() {
+  morobot.begin(SERIAL_PORT);
+  morobot.setZero();  // reset angles / moveHome()
+  //morobot.moveZAxisIn(); doesnt seem to work well moves too much     // Set the global speed for all motors here. This value can be overwritten temporarily if a function is called with a speed parameter explicitely.
+  Serial.begin(115200);
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+}
+
+void loop() 
+{
+  ultraSensor.watchForObjects();
+  if (!client.connected()) 
+  {
+      reconnect();
+  }
+ 
+  morobot.setSpeedRPM(50);
+  float xMove = 45;
+  float yMove = 45;
+
+
+  if (String(Topic) == "Fruitsystem/color")
+  { 
+    if(messageTemp.toInt() == Ripe)//the number it gets when red
+    { 
+      Serial.println("Ripe");
+      messageTemp = "";
+      morobot.moveToAngles(-xMove, yMove, 0); //moves to absolute angles
+      morobot.waitUntilIsReady();
+      client.publish("Fruitsystem/robot", "OnPosition");
+    }
+    else if(messageTemp.toInt() == Unripe)//the number it gets when green
+    {
+      Serial.println("Unripe");
+      messageTemp = "";
+      morobot.moveToAngles(xMove, -yMove, 0);
+      morobot.waitUntilIsReady();
+      client.publish("Fruitsystem/robot", "OnPosition");
+    }
+    Topic = "";
+  }
+  client.publish("Fruitsystem/robot", "Temp: %d", morobot.getTemp());
+  if(ultraSensor.getFlag() == true)
+  {
+    Serial.println("Something just passed");
+    ultraSensor.disableFlag();
+  }   
+   client.loop();
+}
+
+//Functions
 void setup_wifi() {
   delay(10);
   // We start by connecting to a WiFi network
@@ -47,7 +108,7 @@ void reconnect() {
   {
       Serial.print("Attempting MQTT connection...");
       // Attempt to connect
-      if (client.connect("ESP8266Client")) 
+      if (client.connect("Robot")) 
       {
         Serial.println("connected");
         // Subscribe
@@ -69,7 +130,7 @@ void callback(char* topic, byte* message, unsigned int length)
 {
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
-  Topic = topic; //doesn't work good
+  Topic = String(topic); 
   Serial.print(". Message: ");
   
   for (int i = 0; i < length; i++) 
@@ -79,54 +140,4 @@ void callback(char* topic, byte* message, unsigned int length)
   }
   
   Serial.println();
-}
-
-void setup() {
-  morobot.begin(SERIAL_PORT);
-  morobot.setZero();  // reset angles / moveHome()
-  //morobot.moveZAxisIn(); doesnt seem to work well moves too much     // Set the global speed for all motors here. This value can be overwritten temporarily if a function is called with a speed parameter explicitely.
-
-  Serial.begin(115200);
-  
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
-}
-
-void clearBuffer() {
-  messageTemp = "";
-}
-
-void loop() {
-
-  if (!client.connected()) 
-  {
-    reconnect();
-  }
- 
-  morobot.setSpeedRPM(1);
-  float xMove = 90;
-  float yMove = 90;
-
-
-  if (String(Topic) == "Fruitsystem/color")
-  { 
-    if(messageTemp == "1")//the number it gets when red
-    { 
-      Serial.println("Ripe");
-      clearBuffer();
-      morobot.moveToAngles(-xMove, yMove, 0); //moves to absolute angles
-      morobot.waitUntilIsReady();
-    }
-    else if(messageTemp == "0")//the number it gets when green
-    {
-      Serial.println("Unripe");
-      clearBuffer();
-      morobot.moveToAngles(xMove, -yMove, 0);
-      morobot.waitUntilIsReady();
-    }
-    strcpy(Topic, " ");
-  }
-   
-   client.loop();
 }
