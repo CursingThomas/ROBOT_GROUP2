@@ -27,6 +27,12 @@ previousRed = CurrentTime()
 # 0 .. live camera input
 webcam = cv2.VideoCapture(0)
 
+def make():
+	webcam.set(3,640)
+	webcam.set(4,480)
+
+make()
+
 # colors the camera is looking out for :
 # - red
 # - green
